@@ -4,10 +4,14 @@ import { useEffect, useState } from "react";
 import { getState, hasSolvedToday } from "@/lib/storage";
 import TrackerDropdown from "@/components/TrackerDropdown";
 import SolveModal from "@/components/SolveModal";
+import ShopModal from "@/components/ShopModal";
+import FieldCat from "@/components/FieldCat";
+import FieldFlowers from "@/components/FieldFlowers";
 
 export default function Home() {
   const [state, setState] = useState<ReturnType<typeof getState> | null>(null);
   const [showSolve, setShowSolve] = useState(false);
+  const [showShop, setShowShop] = useState(false);
 
   useEffect(() => {
     const s = getState();
@@ -51,7 +55,10 @@ export default function Home() {
           </div>
 
           {/* Shop button */}
-          <button className="px-3 py-1.5 bg-green-500 hover:bg-green-400 rounded text-sm font-medium transition-colors">
+          <button
+            onClick={() => setShowShop(true)}
+            className="px-3 py-1.5 bg-green-500 hover:bg-green-400 rounded text-sm font-medium transition-colors"
+          >
             Shop
           </button>
 
@@ -60,36 +67,20 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Main content — cat landscape */}
-      <div className="flex-1 flex flex-col items-center justify-center gap-6">
-        <div
-          className="w-40 h-40 bg-white/50 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden"
-        >
-          <div
-            className="w-8 h-8"
-            style={{
-              backgroundImage: "url(/sprites/cats.png)",
-              backgroundPosition: "0 0",
-              backgroundSize: "256px 320px",
-              imageRendering: "pixelated",
-              transform: "scale(4)",
-            }}
-          />
-        </div>
-
-        <p className="text-white text-lg font-medium drop-shadow-md">
-          {state.solvedProblems.length === 0
-            ? "Solve a problem to start collecting cats!"
-            : `You've solved ${state.solvedProblems.length} problem${state.solvedProblems.length === 1 ? "" : "s"}!`}
-        </p>
-
-        <button
-          onClick={() => setShowSolve(true)}
-          className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5"
-        >
-          Solve a Problem
-        </button>
+      {/* Field with cat and flowers */}
+      <div className="flex-1 relative">
+        <FieldFlowers placedItems={state.placedItems} />
+        <FieldCat />
       </div>
+
+      {/* Shop modal */}
+      {showShop && (
+        <ShopModal
+          onClose={() => setShowShop(false)}
+          onPurchase={refreshState}
+          currency={state.currency}
+        />
+      )}
 
       {/* Solve modal */}
       {showSolve && (

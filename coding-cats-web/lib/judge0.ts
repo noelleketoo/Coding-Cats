@@ -1,20 +1,3 @@
-const JUDGE0_URL = "https://judge0-ce.p.rapidapi.com";
-const PYTHON3_ID = 71;
-
-// Users need to get a free API key from https://rapidapi.com/judge0-official/api/judge0-ce
-// For now we'll use a placeholder — set this in .env.local as NEXT_PUBLIC_JUDGE0_KEY
-function getApiKey(): string {
-  return process.env.NEXT_PUBLIC_JUDGE0_KEY || "";
-}
-
-interface Submission {
-  stdout: string | null;
-  stderr: string | null;
-  compile_output: string | null;
-  status: { id: number; description: string };
-  time: string;
-}
-
 export interface TestResult {
   input: string;
   expected: string;
@@ -23,31 +6,27 @@ export interface TestResult {
   error?: string;
 }
 
-async function submitCode(
-  code: string,
-  stdin: string
-): Promise<Submission> {
-  const apiKey = getApiKey();
+interface Submission {
+  stdout: string | null;
+  stderr: string | null;
+  compile_output: string | null;
+  status: { id: number; description: string };
+}
 
-  const res = await fetch(`${JUDGE0_URL}/submissions?base64_encoded=false&wait=true`, {
+async function submitCode(code: string, stdin: string): Promise<Submission> {
+  const res = await fetch("/api/submit", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-RapidAPI-Key": apiKey,
-      "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
-    },
-    body: JSON.stringify({
-      source_code: code,
-      language_id: PYTHON3_ID,
-      stdin: stdin,
-    }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code, stdin }),
   });
 
+  const data = await res.json();
+
   if (!res.ok) {
-    throw new Error(`Judge0 API error: ${res.status}`);
+    throw new Error(data.error || `API error: ${res.status}`);
   }
 
-  return res.json();
+  return data;
 }
 
 export async function runTests(

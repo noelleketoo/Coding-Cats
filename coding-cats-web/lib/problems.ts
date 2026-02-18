@@ -41,7 +41,7 @@ export const PROBLEMS: Problem[] = [
 # Read input
 nums = eval(input())
 target = int(input())
-result = two_sum(nums, target)
+result = sorted(two_sum(nums, target))
 print(result[0], result[1])
 `,
   },

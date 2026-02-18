@@ -1,11 +1,19 @@
 import { Category, Difficulty } from "./problems";
 
+export interface PlacedItem {
+  itemId: string;
+  x: number; // percent from left
+  y: number; // percent from bottom
+}
+
 interface GameState {
   currency: number;
   streak: { count: number; lastDate: string };
   solvedProblems: string[];
   categoryProgress: Record<Category, number>;
   lastSolveDate: string;
+  purchasedItems: Record<string, number>; // itemId -> count owned
+  placedItems: PlacedItem[];
 }
 
 const STORAGE_KEY = "coding-cats-state";
@@ -22,6 +30,8 @@ const DEFAULT_STATE: GameState = {
     dp: 0,
   },
   lastSolveDate: "",
+  purchasedItems: {},
+  placedItems: [],
 };
 
 const CURRENCY_REWARDS: Record<Difficulty, number> = {
@@ -76,6 +86,32 @@ export function recordSolve(problemId: string, category: Category, difficulty: D
   state.categoryProgress[category] =
     (state.categoryProgress[category] || 0) + 1;
 
+  saveState(state);
+  return state;
+}
+
+export function purchaseItem(itemId: string, price: number): { success: boolean; state: GameState } {
+  const state = getState();
+  if (state.currency < price) return { success: false, state };
+
+  state.currency -= price;
+  state.purchasedItems[itemId] = (state.purchasedItems[itemId] || 0) + 1;
+
+  saveState(state);
+  return { success: true, state };
+}
+
+export function placeItem(itemId: string, x: number, y: number): GameState {
+  const state = getState();
+  state.placedItems.push({ itemId, x, y });
+  saveState(state);
+  return state;
+}
+
+export function removeLastPlaced(itemId: string): GameState {
+  const state = getState();
+  const idx = state.placedItems.findLastIndex((p) => p.itemId === itemId);
+  if (idx !== -1) state.placedItems.splice(idx, 1);
   saveState(state);
   return state;
 }

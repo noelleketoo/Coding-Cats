@@ -10,7 +10,7 @@ export default function TestResults({ results, allPassed }: TestResultsProps) {
     <div className="border-t border-purple-200 p-4">
       <div className="flex items-center gap-2 mb-3">
         <span className={`text-lg font-bold ${allPassed ? "text-green-600" : "text-red-500"}`}>
-          {allPassed ? "All tests passed! +10 coins" : "Some tests failed"}
+          {allPassed ? "All tests passed!" : `${results.filter(r => r.passed).length}/${results.length} tests passed`}
         </span>
       </div>
 

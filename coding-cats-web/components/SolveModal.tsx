@@ -36,6 +36,7 @@ export default function SolveModal({ onClose, onSolved }: SolveModalProps) {
   const [results, setResults] = useState<TestResult[] | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [solved, setSolved] = useState(false);
+  const [statusMsg, setStatusMsg] = useState<string | null>(null);
 
   function selectDifficulty(difficulty: Difficulty) {
     const problem = choices[difficulty];
@@ -43,12 +44,14 @@ export default function SolveModal({ onClose, onSolved }: SolveModalProps) {
     setCode(problem.starterCode);
     setResults(null);
     setSolved(false);
+    setStatusMsg(null);
   }
 
   async function handleSubmit() {
     if (!selectedProblem) return;
     setSubmitting(true);
     setResults(null);
+    setStatusMsg("Running your code...");
 
     try {
       const testResults = await runTests(code, selectedProblem.testCases);
@@ -58,10 +61,18 @@ export default function SolveModal({ onClose, onSolved }: SolveModalProps) {
       if (allPassed && !solved) {
         recordSolve(selectedProblem.id, selectedProblem.category, selectedProblem.difficulty);
         setSolved(true);
+        setStatusMsg(`+${REWARD_MAP[selectedProblem.difficulty]} coins! Great job!`);
         onSolved();
+
+        setTimeout(() => {
+          onClose();
+        }, 2500);
+      } else if (!allPassed) {
+        setStatusMsg(`${testResults.filter(r => r.passed).length}/${testResults.length} tests passed. Try again!`);
       }
     } catch (e) {
       console.error("Submit error:", e);
+      setStatusMsg("Error: " + (e instanceof Error ? e.message : String(e)));
     } finally {
       setSubmitting(false);
     }
@@ -119,7 +130,20 @@ export default function SolveModal({ onClose, onSolved }: SolveModalProps) {
   // Code editor screen
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/50" />
+
+      {/* Fixed status toast at top of screen */}
+      {statusMsg && (
+        <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-[60] px-6 py-3 rounded-xl font-bold shadow-lg text-white text-lg ${
+          solved ? "bg-green-500" :
+          submitting ? "bg-blue-500" :
+          allPassed ? "bg-green-500" :
+          results ? "bg-red-500" :
+          "bg-blue-500"
+        }`}>
+          {statusMsg}
+        </div>
+      )}
 
       <div className="relative w-[90vw] h-[85vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden">
         {/* Modal header */}
@@ -145,10 +169,10 @@ export default function SolveModal({ onClose, onSolved }: SolveModalProps) {
           <div className="flex items-center gap-3">
             <button
               onClick={handleSubmit}
-              disabled={submitting}
+              disabled={submitting || solved}
               className="px-4 py-1.5 bg-green-500 hover:bg-green-600 disabled:bg-gray-400 rounded font-medium text-sm transition-colors"
             >
-              {submitting ? "Running..." : "Submit"}
+              {submitting ? "Running..." : solved ? "Solved!" : "Submit"}
             </button>
             <button
               onClick={onClose}
@@ -159,27 +183,35 @@ export default function SolveModal({ onClose, onSolved }: SolveModalProps) {
           </div>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 flex overflow-hidden">
+        {/* Content: problem left, editor + results right */}
+        <div className="flex-1 flex min-h-0">
+          {/* Problem panel */}
           <div className="w-1/2 border-r border-purple-200 overflow-y-auto">
             <ProblemDisplay problem={selectedProblem} />
           </div>
 
-          <div className="w-1/2 flex flex-col">
-            <div className="flex-1">
+          {/* Editor + results panel */}
+          <div className="w-1/2 flex flex-col min-h-0">
+            {/* Editor takes 60% when results are showing, 100% otherwise */}
+            <div className={results ? "h-[60%]" : "flex-1"}>
               <CodeEditor value={code} onChange={setCode} />
             </div>
 
+            {/* Test results take remaining 40% */}
             {results && (
-              <TestResults results={results} allPassed={allPassed} />
+              <div className="h-[40%] overflow-y-auto">
+                <TestResults results={results} allPassed={allPassed} />
+              </div>
             )}
           </div>
         </div>
 
-        {/* Solved banner */}
+        {/* Success overlay */}
         {solved && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg text-lg">
-            +{REWARD_MAP[selectedProblem.difficulty]} coins! Great job!
+          <div className="absolute inset-0 bg-green-500/20 flex items-center justify-center pointer-events-none">
+            <div className="bg-green-500 text-white px-8 py-4 rounded-2xl font-bold shadow-2xl text-xl">
+              +{REWARD_MAP[selectedProblem.difficulty]} coins! Great job!
+            </div>
           </div>
         )}
       </div>
