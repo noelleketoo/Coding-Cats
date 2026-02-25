@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getState, hasSolvedToday } from "@/lib/storage";
+import { getState, hasSolvedToday, placeItem } from "@/lib/storage";
+import { ShopItem } from "@/lib/shopItems";
 import TrackerDropdown from "@/components/TrackerDropdown";
 import SolveModal from "@/components/SolveModal";
 import ShopModal from "@/components/ShopModal";
@@ -12,6 +13,8 @@ export default function Home() {
   const [state, setState] = useState<ReturnType<typeof getState> | null>(null);
   const [showSolve, setShowSolve] = useState(false);
   const [showShop, setShowShop] = useState(false);
+  const [placingItem, setPlacingItem] = useState<ShopItem | null>(null);
+  const [previewPos, setPreviewPos] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     const s = getState();
@@ -25,6 +28,32 @@ export default function Home() {
 
   function refreshState() {
     setState(getState());
+  }
+
+  function handlePurchase(item: ShopItem) {
+    setShowShop(false);
+    setPlacingItem(item);
+    refreshState();
+  }
+
+  function handleFieldMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    if (!placingItem) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    setPreviewPos({
+      x: ((e.clientX - rect.left) / rect.width) * 100,
+      y: ((rect.bottom - e.clientY) / rect.height) * 100,
+    });
+  }
+
+  function handleFieldClick(e: React.MouseEvent<HTMLDivElement>) {
+    if (!placingItem) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((rect.bottom - e.clientY) / rect.height) * 100;
+    placeItem(placingItem.id, x, y);
+    setPlacingItem(null);
+    setPreviewPos(null);
+    refreshState();
   }
 
   if (!state) return null;
@@ -44,13 +73,13 @@ export default function Home() {
         <div className="flex items-center gap-4">
           {/* Currency */}
           <div className="flex items-center gap-1.5">
-            <span className="text-yellow-300">&#x1FA99;</span>
+            <img src="/sprites/coin.png" alt="coin" width={20} height={20} style={{ imageRendering: "pixelated" }} />
             <span className="font-medium">{state.currency}</span>
           </div>
 
           {/* Streak */}
           <div className="flex items-center gap-1.5">
-            <span className="text-orange-300">&#x1F525;</span>
+            <img src="/sprites/fire.png" alt="streak" width={20} height={20} style={{ imageRendering: "pixelated" }} />
             <span className="font-medium">{state.streak.count}</span>
           </div>
 
@@ -68,16 +97,46 @@ export default function Home() {
       </div>
 
       {/* Field with cat and flowers */}
-      <div className="flex-1 relative">
+      <div
+        className="flex-1 relative"
+        style={{ cursor: placingItem ? "crosshair" : undefined }}
+        onMouseMove={handleFieldMouseMove}
+        onClick={handleFieldClick}
+      >
         <FieldFlowers placedItems={state.placedItems} />
         <FieldCat />
+
+        {/* Placement preview */}
+        {placingItem && previewPos && (
+          <img
+            src={placingItem.imageSrc}
+            alt={placingItem.name}
+            width={48}
+            height={48}
+            className="absolute pointer-events-none opacity-70"
+            style={{
+              left: `${previewPos.x}%`,
+              bottom: `${previewPos.y}%`,
+              transform: "translateX(-50%)",
+              imageRendering: "pixelated",
+            }}
+          />
+        )}
+
+        {/* Hint banner */}
+        {placingItem && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-black/70 text-white px-4 py-2 rounded-xl text-sm font-bold pointer-events-none">
+            <img src={placingItem.imageSrc} alt="" width={24} height={24} style={{ imageRendering: "pixelated" }} />
+            Click to place {placingItem.name}
+          </div>
+        )}
       </div>
 
       {/* Shop modal */}
       {showShop && (
         <ShopModal
           onClose={() => setShowShop(false)}
-          onPurchase={refreshState}
+          onPurchase={handlePurchase}
           currency={state.currency}
         />
       )}

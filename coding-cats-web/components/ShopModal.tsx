@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { SHOP_ITEMS, ShopItem } from "@/lib/shopItems";
-import { purchaseItem, placeItem, getState } from "@/lib/storage";
+import { purchaseItem, getState } from "@/lib/storage";
 
 interface ShopModalProps {
   onClose: () => void;
-  onPurchase: () => void;
+  onPurchase: (item: ShopItem) => void;
   currency: number;
 }
 
@@ -20,11 +20,6 @@ const CATEGORY_LABELS: Record<ShopCategory, string> = {
   decor: "Decor",
 };
 
-function spritePath(item: ShopItem): string {
-  const col = (item.spriteX - 16) / 32;
-  const row = (item.spriteY - 16) / 32;
-  return `/sprites/shop/${col}_${row}.png`;
-}
 
 export default function ShopModal({ onClose, onPurchase, currency }: ShopModalProps) {
   const [coins, setCoins] = useState(currency);
@@ -47,15 +42,9 @@ export default function ShopModal({ onClose, onPurchase, currency }: ShopModalPr
 
     const { success, state } = purchaseItem(item.id, item.price);
     if (success) {
-      const randomX = 10 + Math.random() * 80;
-      const randomY = 10 + Math.random() * 30;
-      placeItem(item.id, randomX, randomY);
-
       setCoins(state.currency);
       setOwnedCounts({ ...getState().purchasedItems });
-      setToast({ msg: `Bought ${item.name}!`, type: "success" });
-      onPurchase();
-      setTimeout(() => setToast(null), 1500);
+      onPurchase(item);
     }
   }
 
@@ -76,7 +65,7 @@ export default function ShopModal({ onClose, onPurchase, currency }: ShopModalPr
           <h2 className="text-2xl font-bold text-green-800">Flower Shop</h2>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5 text-lg">
-              <span className="text-yellow-500">&#x1FA99;</span>
+              <img src="/sprites/coin.png" alt="coin" width={20} height={20} style={{ imageRendering: "pixelated" }} />
               <span className="font-bold text-green-700">{coins}</span>
             </div>
             <button
@@ -116,7 +105,7 @@ export default function ShopModal({ onClose, onPurchase, currency }: ShopModalPr
                   className="border-2 border-green-200 rounded-xl p-3 flex flex-col items-center gap-1.5 bg-green-50/50 hover:border-green-400 transition-colors"
                 >
                   <img
-                    src={spritePath(item)}
+                    src={item.imageSrc}
                     alt={item.name}
                     width={48}
                     height={48}
@@ -143,7 +132,7 @@ export default function ShopModal({ onClose, onPurchase, currency }: ShopModalPr
                         : "bg-gray-200 text-gray-400 cursor-not-allowed"
                     }`}
                   >
-                    &#x1FA99; {item.price}
+                    <img src="/sprites/coin.png" alt="coin" width={14} height={14} style={{ imageRendering: "pixelated", display: "inline", verticalAlign: "middle", marginRight: 2 }} />{item.price}
                   </button>
                 </div>
               );
