@@ -139,6 +139,210 @@ print(is_palindrome(s))
 `,
   },
 
+  {
+    id: "sum-of-list",
+    title: "Sum of List",
+    category: "arrays",
+    difficulty: "easy",
+    description:
+      "Given a list of integers `nums`, print the sum of all the numbers.",
+    examples: [
+      { input: "nums = [1, 2, 3, 4, 5]", output: "15" },
+      { input: "nums = [10, -5, 3]", output: "8" },
+    ],
+    testCases: [
+      { input: "[1, 2, 3, 4, 5]", expected: "15" },
+      { input: "[10, -5, 3]", expected: "8" },
+      { input: "[0]", expected: "0" },
+      { input: "[-1, -2, -3]", expected: "-6" },
+    ],
+    starterCode: `def sum_of_list(nums):
+    # Your code here
+    pass
+
+nums = eval(input())
+print(sum_of_list(nums))
+`,
+  },
+  {
+    id: "find-maximum",
+    title: "Find Maximum",
+    category: "arrays",
+    difficulty: "easy",
+    description:
+      "Given a list of integers `nums`, print the largest number in the list.",
+    examples: [
+      { input: "nums = [1, 5, 3, 2]", output: "5" },
+      { input: "nums = [-1, -5, -2]", output: "-1" },
+    ],
+    testCases: [
+      { input: "[1, 5, 3, 2]", expected: "5" },
+      { input: "[-1, -5, -2]", expected: "-1" },
+      { input: "[42]", expected: "42" },
+      { input: "[0, 100, 50]", expected: "100" },
+    ],
+    starterCode: `def find_maximum(nums):
+    # Your code here
+    pass
+
+nums = eval(input())
+print(find_maximum(nums))
+`,
+  },
+  {
+    id: "count-vowels",
+    title: "Count Vowels",
+    category: "strings",
+    difficulty: "easy",
+    description:
+      "Given a string `s`, print the number of vowels (`a`, `e`, `i`, `o`, `u`) in the string. Ignore case.",
+    examples: [
+      { input: 's = "hello"', output: "2", explanation: "e and o are vowels" },
+      { input: 's = "aeiou"', output: "5" },
+    ],
+    testCases: [
+      { input: "hello", expected: "2" },
+      { input: "aeiou", expected: "5" },
+      { input: "xyz", expected: "0" },
+      { input: "Coding Cats", expected: "3" },
+    ],
+    starterCode: `def count_vowels(s):
+    # Your code here
+    pass
+
+s = input()
+print(count_vowels(s))
+`,
+  },
+  {
+    id: "even-or-odd",
+    title: "Even or Odd",
+    category: "math",
+    difficulty: "easy",
+    description:
+      'Given an integer `n`, print `"Even"` if the number is even, or `"Odd"` if it is odd.',
+    examples: [
+      { input: "n = 4", output: "Even" },
+      { input: "n = 7", output: "Odd" },
+    ],
+    testCases: [
+      { input: "4", expected: "Even" },
+      { input: "7", expected: "Odd" },
+      { input: "0", expected: "Even" },
+      { input: "-3", expected: "Odd" },
+    ],
+    starterCode: `def even_or_odd(n):
+    # Your code here
+    pass
+
+n = int(input())
+print(even_or_odd(n))
+`,
+  },
+  {
+    id: "sum-of-digits",
+    title: "Sum of Digits",
+    category: "math",
+    difficulty: "easy",
+    description:
+      "Given a non-negative integer `n`, print the sum of all its digits.",
+    examples: [
+      { input: "n = 123", output: "6", explanation: "1 + 2 + 3 = 6" },
+      { input: "n = 99", output: "18" },
+    ],
+    testCases: [
+      { input: "123", expected: "6" },
+      { input: "99", expected: "18" },
+      { input: "0", expected: "0" },
+      { input: "1000", expected: "1" },
+    ],
+    starterCode: `def sum_of_digits(n):
+    # Your code here
+    pass
+
+n = int(input())
+print(sum_of_digits(n))
+`,
+  },
+  {
+    id: "count-words",
+    title: "Count Words",
+    category: "strings",
+    difficulty: "easy",
+    description:
+      "Given a sentence `s`, print the number of words in it. Words are separated by spaces.",
+    examples: [
+      { input: 's = "hello world"', output: "2" },
+      { input: 's = "the quick brown fox"', output: "4" },
+    ],
+    testCases: [
+      { input: "hello world", expected: "2" },
+      { input: "the quick brown fox", expected: "4" },
+      { input: "one", expected: "1" },
+      { input: "coding cats is fun", expected: "4" },
+    ],
+    starterCode: `def count_words(s):
+    # Your code here
+    pass
+
+s = input()
+print(count_words(s))
+`,
+  },
+  {
+    id: "contains-duplicate",
+    title: "Contains Duplicate",
+    category: "hashmap",
+    difficulty: "easy",
+    description:
+      'Given a list of integers `nums`, print `"True"` if any value appears more than once, otherwise print `"False"`.',
+    examples: [
+      {
+        input: "nums = [1, 2, 3, 1]",
+        output: "True",
+        explanation: "1 appears twice",
+      },
+      { input: "nums = [1, 2, 3, 4]", output: "False" },
+    ],
+    testCases: [
+      { input: "[1, 2, 3, 1]", expected: "True" },
+      { input: "[1, 2, 3, 4]", expected: "False" },
+      { input: "[1]", expected: "False" },
+      { input: "[5, 5, 5]", expected: "True" },
+    ],
+    starterCode: `def contains_duplicate(nums):
+    # Your code here
+    pass
+
+nums = eval(input())
+print(contains_duplicate(nums))
+`,
+  },
+  {
+    id: "square-number",
+    title: "Square Number",
+    category: "math",
+    difficulty: "easy",
+    description: "Given an integer `n`, print its square (n × n).",
+    examples: [
+      { input: "n = 5", output: "25" },
+      { input: "n = 3", output: "9" },
+    ],
+    testCases: [
+      { input: "5", expected: "25" },
+      { input: "3", expected: "9" },
+      { input: "0", expected: "0" },
+      { input: "10", expected: "100" },
+    ],
+    starterCode: `def square_number(n):
+    # Your code here
+    pass
+
+n = int(input())
+print(square_number(n))
+`,
+  },
+
   // ===== MEDIUM =====
   {
     id: "max-subarray",
