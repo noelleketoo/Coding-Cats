@@ -1,16 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 
-// Sprite sheet is 256x320, frames are 32x32
-// Row 0: sitting frames (columns 0-3)
-// Row 4: walking right frames (columns 0-4)
-// Row 5: walking right frames continued
+// Sprite sheet is 256x320, frames are 32x32 (8 cols x 10 rows)
 const FRAME_SIZE = 32;
 const SHEET_W = 256;
 const SHEET_H = 320;
 
-// Idle frames: top row, first 4 columns
 const IDLE_FRAMES = [
   { x: 0, y: 0 },
   { x: 32, y: 0 },
@@ -18,7 +14,6 @@ const IDLE_FRAMES = [
   { x: 32, y: 0 },
 ];
 
-// Walk frames: row 4 (y=128), first 5 columns
 const WALK_FRAMES = [
   { x: 0, y: 128 },
   { x: 32, y: 128 },
@@ -27,10 +22,64 @@ const WALK_FRAMES = [
   { x: 128, y: 128 },
 ];
 
-type CatState = "idle" | "walking";
+// Row 2 (y=64): alternate sitting/looking pose
+const SIT2_FRAMES = [
+  { x: 0, y: 64 },
+  { x: 32, y: 64 },
+  { x: 64, y: 64 },
+  { x: 32, y: 64 },
+];
+
+// Row 6 (y=192): jump / hop
+const JUMP_FRAMES = [
+  { x: 0, y: 192 },
+  { x: 32, y: 192 },
+  { x: 64, y: 192 },
+  { x: 96, y: 192 },
+];
+
+// Row 7 (y=224): sleeping / lying down
+const SLEEP_FRAMES = [
+  { x: 0, y: 224 },
+  { x: 32, y: 224 },
+  { x: 64, y: 224 },
+  { x: 96, y: 224 },
+  { x: 64, y: 224 },
+  { x: 32, y: 224 },
+];
+
+// Row 9 (y=288): excited / running
+const RUN_FRAMES = [
+  { x: 0, y: 288 },
+  { x: 32, y: 288 },
+  { x: 64, y: 288 },
+  { x: 96, y: 288 },
+  { x: 128, y: 288 },
+  { x: 160, y: 288 },
+];
+
+type CatState = "idle" | "idle2" | "walking" | "jumping" | "sleeping" | "running";
+
+const FRAME_SPEEDS: Record<CatState, number> = {
+  idle: 400,
+  idle2: 400,
+  walking: 150,
+  jumping: 120,
+  sleeping: 600,
+  running: 100,
+};
+
+const STATE_FRAMES: Record<CatState, { x: number; y: number }[]> = {
+  idle: IDLE_FRAMES,
+  idle2: SIT2_FRAMES,
+  walking: WALK_FRAMES,
+  jumping: JUMP_FRAMES,
+  sleeping: SLEEP_FRAMES,
+  running: RUN_FRAMES,
+};
 
 export default function FieldCat() {
-  const [posX, setPosX] = useState(50); // percent from left
+  const [posX, setPosX] = useState(50);
   const [frame, setFrame] = useState(0);
   const [catState, setCatState] = useState<CatState>("idle");
   const [facingLeft, setFacingLeft] = useState(false);
@@ -41,36 +90,47 @@ export default function FieldCat() {
     const behaviorInterval = setInterval(() => {
       const rand = Math.random();
 
-      if (rand < 0.4) {
-        // 40% chance: stay idle
+      if (rand < 0.2) {
         setCatState("idle");
+      } else if (rand < 0.35) {
+        setCatState("idle2");
+      } else if (rand < 0.45) {
+        setCatState("sleeping");
+      } else if (rand < 0.55) {
+        setCatState("jumping");
+      } else if (rand < 0.65) {
+        // running: pick a far target
+        const newTarget = 10 + Math.random() * 80;
+        setTargetX(newTarget);
+        setFacingLeft(newTarget < posX);
+        setCatState("running");
       } else {
-        // 60% chance: walk to a random spot
-        const newTarget = 15 + Math.random() * 70; // keep between 15% and 85%
+        // walking: pick a nearby target
+        const newTarget = 15 + Math.random() * 70;
         setTargetX(newTarget);
         setFacingLeft(newTarget < posX);
         setCatState("walking");
       }
-    }, 3000 + Math.random() * 3000); // every 3-6 seconds
+    }, 3000 + Math.random() * 3000);
 
     return () => clearInterval(behaviorInterval);
   }, [posX]);
 
   // Animate frame cycling
   useEffect(() => {
-    const frames = catState === "walking" ? WALK_FRAMES : IDLE_FRAMES;
-    const speed = catState === "walking" ? 150 : 400;
-
-    const frameInterval = setInterval(() => {
+    setFrame(0);
+    const speed = FRAME_SPEEDS[catState];
+    const frames = STATE_FRAMES[catState];
+    const interval = setInterval(() => {
       setFrame((f) => (f + 1) % frames.length);
     }, speed);
-
-    return () => clearInterval(frameInterval);
+    return () => clearInterval(interval);
   }, [catState]);
 
-  // Move toward target when walking
+  // Move toward target when walking or running
   useEffect(() => {
-    if (catState !== "walking") return;
+    if (catState !== "walking" && catState !== "running") return;
+    const speed = catState === "running" ? 0.6 : 0.3;
 
     const moveInterval = setInterval(() => {
       setPosX((current) => {
@@ -79,15 +139,15 @@ export default function FieldCat() {
           setCatState("idle");
           return targetX;
         }
-        return current + Math.sign(diff) * 0.3;
+        return current + Math.sign(diff) * speed;
       });
-    }, 16); // ~60fps
+    }, 16);
 
     return () => clearInterval(moveInterval);
   }, [catState, targetX]);
 
-  const currentFrames = catState === "walking" ? WALK_FRAMES : IDLE_FRAMES;
-  const currentFrame = currentFrames[frame % currentFrames.length];
+  const frames = STATE_FRAMES[catState];
+  const currentFrame = frames[frame % frames.length];
 
   return (
     <div

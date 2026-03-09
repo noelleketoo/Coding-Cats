@@ -19,8 +19,8 @@ export default function FieldFlowers({ placedItems }: FieldFlowersProps) {
             key={i}
             src={item.imageSrc}
             alt={item.name}
-            width={40}
-            height={40}
+            width={128}
+            height={128}
             draggable={false}
             className="absolute"
             style={{

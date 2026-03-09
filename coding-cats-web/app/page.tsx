@@ -15,6 +15,7 @@ export default function Home() {
   const [showShop, setShowShop] = useState(false);
   const [placingItem, setPlacingItem] = useState<ShopItem | null>(null);
   const [previewPos, setPreviewPos] = useState<{ x: number; y: number } | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     const s = getState();
@@ -59,46 +60,65 @@ export default function Home() {
   if (!state) return null;
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden">
+    <div className="relative h-screen overflow-hidden">
       {/* Pixel art background */}
       <div
-        className="absolute inset-0 -z-10 bg-cover bg-center bg-no-repeat"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: "url(/sprites/background.png)", imageRendering: "pixelated" }}
       />
 
       {/* Top bar */}
-      <div className="flex justify-between items-center px-6 py-3 bg-green-700/85 text-white">
-        <h1 className="text-xl font-bold">Coding Cats</h1>
+      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4">
+        <div style={{ width: "800px", height: "500px", overflow: "hidden", position: "relative" }}>
+          <img
+            src="/sprites/top-bar.png"
+            alt=""
+            style={{ width: "800px", height: "auto", imageRendering: "pixelated", position: "absolute", top: "-350px" }}
+          />
+        </div>
+        <div className="flex items-center gap-3 text-white relative" style={{ alignSelf: "flex-start", marginTop: "-10px" }}>
 
-        <div className="flex items-center gap-4">
           {/* Currency */}
           <div className="flex items-center gap-1.5">
-            <img src="/sprites/coin.png" alt="coin" width={20} height={20} style={{ imageRendering: "pixelated" }} />
+            <img src="/sprites/coin.png" alt="coin" width={36} height={36} style={{ imageRendering: "pixelated" }} />
             <span className="font-medium">{state.currency}</span>
           </div>
 
           {/* Streak */}
           <div className="flex items-center gap-1.5">
-            <img src="/sprites/fire.png" alt="streak" width={20} height={20} style={{ imageRendering: "pixelated" }} />
+            <img src="/sprites/fire.png" alt="streak" width={36} height={36} style={{ imageRendering: "pixelated" }} />
             <span className="font-medium">{state.streak.count}</span>
           </div>
 
-          {/* Shop button */}
-          <button
-            onClick={() => setShowShop(true)}
-            className="px-3 py-1.5 bg-green-500 hover:bg-green-400 rounded text-sm font-medium transition-colors"
-          >
-            Shop
-          </button>
-
-          {/* Tracker dropdown */}
-          <TrackerDropdown categoryProgress={state.categoryProgress} />
+          {/* Settings button */}
+          <div className="relative">
+            <button onClick={() => setShowSettings(v => !v)}>
+              <img src="/sprites/settings-button.png" alt="settings" width={80} height={80} style={{ imageRendering: "pixelated" }} />
+            </button>
+            {showSettings && (
+              <div className="absolute right-0 top-12 flex flex-col gap-2 bg-amber-900/90 border-2 border-amber-700 rounded-xl p-3 min-w-[160px] z-20">
+                <button
+                  onClick={() => { setShowShop(true); setShowSettings(false); }}
+                  className="px-3 py-1.5 bg-green-500 hover:bg-green-400 rounded text-sm font-medium transition-colors text-white"
+                >
+                  Shop
+                </button>
+                <button
+                  onClick={() => { setShowSolve(true); setShowSettings(false); }}
+                  className="px-3 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-yellow-900 rounded text-sm font-medium transition-colors"
+                >
+                  + More Problems
+                </button>
+                <TrackerDropdown categoryProgress={state.categoryProgress} />
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Field with cat and flowers */}
       <div
-        className="flex-1 relative"
+        className="absolute inset-0"
         style={{ cursor: placingItem ? "crosshair" : undefined }}
         onMouseMove={handleFieldMouseMove}
         onClick={handleFieldClick}
@@ -111,8 +131,8 @@ export default function Home() {
           <img
             src={placingItem.imageSrc}
             alt={placingItem.name}
-            width={48}
-            height={48}
+            width={96}
+            height={96}
             className="absolute pointer-events-none opacity-70"
             style={{
               left: `${previewPos.x}%`,
