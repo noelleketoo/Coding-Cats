@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getState, hasSolvedToday, placeItem } from "@/lib/storage";
+import { getState, hasSolvedToday, initState, placeItem } from "@/lib/storage";
 import { ShopItem } from "@/lib/shopItems";
 import TrackerDropdown from "@/components/TrackerDropdown";
 import SolveModal from "@/components/SolveModal";
@@ -18,13 +18,12 @@ export default function Home() {
   const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
-    const s = getState();
-    setState(s);
-
-    // Auto-show solve popup every visit until they've submitted today
-    if (!hasSolvedToday()) {
-      setShowSolve(true);
-    }
+    initState().then((s) => {
+      setState(s);
+      if (!hasSolvedToday()) {
+        setShowSolve(true);
+      }
+    });
   }, []);
 
   function refreshState() {

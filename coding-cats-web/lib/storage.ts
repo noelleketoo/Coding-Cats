@@ -1,4 +1,5 @@
 import { Category, Difficulty } from "./problems";
+import { supabase } from "./supabase";
 
 export interface PlacedItem {
   itemId: string;
@@ -40,6 +41,62 @@ const CURRENCY_REWARDS: Record<Difficulty, number> = {
   hard: 10,
 };
 
+// --- Auth ---
+
+export async function ensureUser(): Promise<string | null> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session?.user) return session.user.id;
+
+  const { data, error } = await supabase.auth.signInAnonymously();
+  if (error || !data.user) return null;
+  return data.user.id;
+}
+
+// --- Supabase sync ---
+
+async function loadFromSupabase(): Promise<GameState | null> {
+  const userId = await ensureUser();
+  if (!userId) return null;
+
+  const { data, error } = await supabase
+    .from("user_progress")
+    .select("*")
+    .eq("user_id", userId)
+    .single();
+
+  if (error || !data) return null;
+
+  return {
+    currency: data.currency,
+    streak: { count: data.streak_count, lastDate: data.streak_last_date ?? "" },
+    solvedProblems: data.solved_problems ?? [],
+    categoryProgress: data.category_progress ?? DEFAULT_STATE.categoryProgress,
+    lastSolveDate: data.last_solve_date ?? "",
+    purchasedItems: data.purchased_items ?? {},
+    placedItems: data.placed_items ?? [],
+  };
+}
+
+async function saveToSupabase(state: GameState): Promise<void> {
+  const userId = await ensureUser();
+  if (!userId) return;
+
+  await supabase.from("user_progress").upsert({
+    user_id: userId,
+    currency: state.currency,
+    streak_count: state.streak.count,
+    streak_last_date: state.streak.lastDate,
+    solved_problems: state.solvedProblems,
+    category_progress: state.categoryProgress,
+    last_solve_date: state.lastSolveDate,
+    purchased_items: state.purchasedItems,
+    placed_items: state.placedItems,
+    updated_at: new Date().toISOString(),
+  }, { onConflict: "user_id" });
+}
+
+// --- Local storage ---
+
 export function getState(): GameState {
   if (typeof window === "undefined") return DEFAULT_STATE;
   const raw = localStorage.getItem(STORAGE_KEY);
@@ -49,7 +106,21 @@ export function getState(): GameState {
 
 function saveState(state: GameState) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  // Fire-and-forget sync to Supabase
+  saveToSupabase(state).catch(() => {});
 }
+
+// Call this once on app load to pull state from Supabase and sync locally
+export async function initState(): Promise<GameState> {
+  const remote = await loadFromSupabase();
+  if (remote) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+    return remote;
+  }
+  return getState();
+}
+
+// --- Game logic (unchanged) ---
 
 export function hasSolvedToday(): boolean {
   if (typeof window === "undefined") return false;
@@ -61,17 +132,12 @@ export function hasSolvedToday(): boolean {
 export function recordSolve(problemId: string, category: Category, difficulty: Difficulty): GameState {
   const state = getState();
 
-  // Don't double-count
   if (state.solvedProblems.includes(problemId)) return state;
 
-  // Add currency based on difficulty
   state.currency += CURRENCY_REWARDS[difficulty];
 
-  // Update streak
   const today = new Date().toISOString().split("T")[0];
-  const yesterday = new Date(Date.now() - 86400000)
-    .toISOString()
-    .split("T")[0];
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
 
   if (state.streak.lastDate === yesterday) {
     state.streak.count += 1;
@@ -81,10 +147,8 @@ export function recordSolve(problemId: string, category: Category, difficulty: D
   state.streak.lastDate = today;
   state.lastSolveDate = today;
 
-  // Track problem
   state.solvedProblems.push(problemId);
-  state.categoryProgress[category] =
-    (state.categoryProgress[category] || 0) + 1;
+  state.categoryProgress[category] = (state.categoryProgress[category] || 0) + 1;
 
   saveState(state);
   return state;
