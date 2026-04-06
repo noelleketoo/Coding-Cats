@@ -129,10 +129,10 @@ export function hasSolvedToday(): boolean {
   return state.lastSolveDate === today;
 }
 
-export function recordSolve(problemId: string, category: Category, difficulty: Difficulty): GameState {
+export function recordSolve(problemId: string, category: Category, difficulty: Difficulty): { state: GameState; newCat: Category | null } {
   const state = getState();
 
-  if (state.solvedProblems.includes(problemId)) return state;
+  if (state.solvedProblems.includes(problemId)) return { state, newCat: null };
 
   state.currency += CURRENCY_REWARDS[difficulty];
 
@@ -150,8 +150,10 @@ export function recordSolve(problemId: string, category: Category, difficulty: D
   state.solvedProblems.push(problemId);
   state.categoryProgress[category] = (state.categoryProgress[category] || 0) + 1;
 
+  const newCat = state.categoryProgress[category] === 10 ? category : null;
+
   saveState(state);
-  return state;
+  return { state, newCat };
 }
 
 export function purchaseItem(itemId: string, price: number): { success: boolean; state: GameState } {

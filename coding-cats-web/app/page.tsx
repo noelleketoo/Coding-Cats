@@ -2,12 +2,30 @@
 
 import { useEffect, useState } from "react";
 import { getState, hasSolvedToday, initState, placeItem } from "@/lib/storage";
+import { Category } from "@/lib/problems";
 import { ShopItem } from "@/lib/shopItems";
 import TrackerDropdown from "@/components/TrackerDropdown";
 import SolveModal from "@/components/SolveModal";
 import ShopModal from "@/components/ShopModal";
 import FieldCat from "@/components/FieldCat";
 import FieldFlowers from "@/components/FieldFlowers";
+
+const CATEGORY_LABELS: Record<Category, string> = {
+  arrays: "Arrays",
+  strings: "Strings",
+  math: "Math",
+  hashmap: "HashMap",
+  dp: "Dynamic Programming",
+};
+
+// Spread extra cats at fixed positions so they don't all stack
+const CAT_POSITIONS: Record<Category, number> = {
+  arrays: 20,
+  strings: 35,
+  math: 65,
+  hashmap: 80,
+  dp: 50,
+};
 
 export default function Home() {
   const [state, setState] = useState<ReturnType<typeof getState> | null>(null);
@@ -16,6 +34,7 @@ export default function Home() {
   const [placingItem, setPlacingItem] = useState<ShopItem | null>(null);
   const [previewPos, setPreviewPos] = useState<{ x: number; y: number } | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [newCatUnlock, setNewCatUnlock] = useState<Category | null>(null);
 
   useEffect(() => {
     initState().then((s) => {
@@ -26,8 +45,12 @@ export default function Home() {
     });
   }, []);
 
-  function refreshState() {
+  function refreshState(newCat: Category | null = null) {
     setState(getState());
+    if (newCat) {
+      setNewCatUnlock(newCat);
+      setTimeout(() => setNewCatUnlock(null), 4000);
+    }
   }
 
   function handlePurchase(item: ShopItem) {
@@ -58,6 +81,10 @@ export default function Home() {
 
   if (!state) return null;
 
+  const unlockedCategories = (Object.keys(state.categoryProgress) as Category[]).filter(
+    (cat) => (state.categoryProgress[cat] || 0) >= 10
+  );
+
   return (
     <div className="relative h-screen overflow-hidden">
       {/* Pixel art background */}
@@ -67,15 +94,9 @@ export default function Home() {
       />
 
       {/* Top bar */}
-      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4">
-        <div style={{ width: "800px", height: "500px", overflow: "hidden", position: "relative" }}>
-          <img
-            src="/sprites/top-bar.png"
-            alt=""
-            style={{ width: "800px", height: "auto", imageRendering: "pixelated", position: "absolute", top: "-350px" }}
-          />
-        </div>
-        <div className="flex items-center gap-3 text-white relative" style={{ alignSelf: "flex-start", marginTop: "-10px" }}>
+      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-2 bg-black/20">
+        <span className="text-white font-bold text-4xl">Coding Cats</span>
+        <div className="flex items-center gap-3 text-white relative">
 
           {/* Currency */}
           <div className="flex items-center gap-1.5">
@@ -115,7 +136,14 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Field with cat and flowers */}
+      {/* Cat unlock celebration banner */}
+      {newCatUnlock && (
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50 bg-yellow-400 text-yellow-900 px-6 py-3 rounded-2xl font-bold shadow-2xl text-lg animate-bounce pointer-events-none">
+          New cat unlocked: {CATEGORY_LABELS[newCatUnlock]}!
+        </div>
+      )}
+
+      {/* Field with cats and flowers */}
       <div
         className="absolute inset-0"
         style={{ cursor: placingItem ? "crosshair" : undefined }}
@@ -123,7 +151,14 @@ export default function Home() {
         onClick={handleFieldClick}
       >
         <FieldFlowers placedItems={state.placedItems} />
+
+        {/* Main cat */}
         <FieldCat />
+
+        {/* Extra cats for each unlocked category */}
+        {unlockedCategories.map((cat) => (
+          <FieldCat key={cat} initialX={CAT_POSITIONS[cat]} />
+        ))}
 
         {/* Placement preview */}
         {placingItem && previewPos && (

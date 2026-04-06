@@ -78,12 +78,12 @@ const STATE_FRAMES: Record<CatState, { x: number; y: number }[]> = {
   running: RUN_FRAMES,
 };
 
-export default function FieldCat() {
-  const [posX, setPosX] = useState(50);
+export default function FieldCat({ initialX = 50 }: { initialX?: number }) {
+  const [posX, setPosX] = useState(initialX);
   const [frame, setFrame] = useState(0);
   const [catState, setCatState] = useState<CatState>("idle");
   const [facingLeft, setFacingLeft] = useState(false);
-  const [targetX, setTargetX] = useState(50);
+  const [targetX, setTargetX] = useState(initialX);
 
   // Pick a new random behavior every few seconds
   useEffect(() => {

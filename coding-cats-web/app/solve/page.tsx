@@ -52,8 +52,13 @@ function SolvePageInner() {
 
       const allPassed = testResults.every((r) => r.passed);
       if (allPassed && !solved) {
-        recordSolve(problem.id, problem.category, problem.difficulty);
+        const { newCat } = recordSolve(problem.id, problem.category, problem.difficulty);
         setSolved(true);
+        if (newCat) {
+          // briefly show unlock message in page title area
+          document.title = `Cat unlocked: ${newCat}! - Coding Cats`;
+          setTimeout(() => { document.title = "Coding Cats"; }, 4000);
+        }
       }
     } catch (e) {
       console.error("Submit error:", e);

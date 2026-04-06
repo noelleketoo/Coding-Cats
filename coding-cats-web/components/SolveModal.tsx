@@ -10,7 +10,7 @@ import { getState, recordSolve } from "@/lib/storage";
 
 interface SolveModalProps {
   onClose: () => void;
-  onSolved: () => void;
+  onSolved: (newCat: import("@/lib/problems").Category | null) => void;
 }
 
 const REWARD_MAP: Record<Difficulty, number> = {
@@ -59,10 +59,10 @@ export default function SolveModal({ onClose, onSolved }: SolveModalProps) {
 
       const allPassed = testResults.every((r) => r.passed);
       if (allPassed && !solved) {
-        recordSolve(selectedProblem.id, selectedProblem.category, selectedProblem.difficulty);
+        const { newCat } = recordSolve(selectedProblem.id, selectedProblem.category, selectedProblem.difficulty);
         setSolved(true);
         setStatusMsg(`+${REWARD_MAP[selectedProblem.difficulty]} coins! Great job!`);
-        onSolved();
+        onSolved(newCat);
 
         setTimeout(() => {
           onClose();
