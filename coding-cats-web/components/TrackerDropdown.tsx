@@ -30,10 +30,10 @@ export default function TrackerDropdown({ categoryProgress }: TrackerDropdownPro
   }, []);
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative w-full" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="px-3 py-1.5 bg-green-500 hover:bg-green-400 rounded text-sm font-medium transition-colors"
+        className="w-full px-3 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-yellow-900 rounded text-sm font-medium transition-colors"
       >
         Tracker
       </button>

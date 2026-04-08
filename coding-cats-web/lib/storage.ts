@@ -7,7 +7,16 @@ export interface PlacedItem {
   y: number; // percent from bottom
 }
 
-interface GameState {
+export interface SolvedEntry {
+  id: string;
+  title: string;
+  category: string;
+  difficulty: string;
+  date: string;
+  solution: string;
+}
+
+export interface GameState {
   currency: number;
   streak: { count: number; lastDate: string };
   solvedProblems: string[];
@@ -15,6 +24,9 @@ interface GameState {
   lastSolveDate: string;
   purchasedItems: Record<string, number>; // itemId -> count owned
   placedItems: PlacedItem[];
+  equippedHat: string | null;
+  purchasedHints: string[];
+  solvedHistory: SolvedEntry[];
 }
 
 const STORAGE_KEY = "coding-cats-state";
@@ -33,6 +45,9 @@ const DEFAULT_STATE: GameState = {
   lastSolveDate: "",
   purchasedItems: {},
   placedItems: [],
+  equippedHat: null,
+  purchasedHints: [],
+  solvedHistory: [],
 };
 
 const CURRENCY_REWARDS: Record<Difficulty, number> = {
@@ -74,6 +89,9 @@ async function loadFromSupabase(): Promise<GameState | null> {
     lastSolveDate: data.last_solve_date ?? "",
     purchasedItems: data.purchased_items ?? {},
     placedItems: data.placed_items ?? [],
+    equippedHat: data.equipped_hat ?? null,
+    purchasedHints: data.purchased_hints ?? [],
+    solvedHistory: data.solved_history ?? [],
   };
 }
 
@@ -91,6 +109,9 @@ async function saveToSupabase(state: GameState): Promise<void> {
     last_solve_date: state.lastSolveDate,
     purchased_items: state.purchasedItems,
     placed_items: state.placedItems,
+    equipped_hat: state.equippedHat,
+    purchased_hints: state.purchasedHints,
+    solved_history: state.solvedHistory,
     updated_at: new Date().toISOString(),
   }, { onConflict: "user_id" });
 }
@@ -129,7 +150,7 @@ export function hasSolvedToday(): boolean {
   return state.lastSolveDate === today;
 }
 
-export function recordSolve(problemId: string, category: Category, difficulty: Difficulty): { state: GameState; newCat: Category | null } {
+export function recordSolve(problemId: string, category: Category, difficulty: Difficulty, title: string, solution: string): { state: GameState; newCat: Category | null } {
   const state = getState();
 
   if (state.solvedProblems.includes(problemId)) return { state, newCat: null };
@@ -149,6 +170,11 @@ export function recordSolve(problemId: string, category: Category, difficulty: D
 
   state.solvedProblems.push(problemId);
   state.categoryProgress[category] = (state.categoryProgress[category] || 0) + 1;
+
+  state.solvedHistory = [
+    { id: problemId, title, category, difficulty, date: today, solution },
+    ...(state.solvedHistory || []),
+  ];
 
   const newCat = state.categoryProgress[category] === 10 ? category : null;
 
@@ -180,4 +206,23 @@ export function removeLastPlaced(itemId: string): GameState {
   if (idx !== -1) state.placedItems.splice(idx, 1);
   saveState(state);
   return state;
+}
+
+export function equipHat(hatId: string | null): GameState {
+  const state = getState();
+  state.equippedHat = hatId;
+  saveState(state);
+  return state;
+}
+
+export const HINT_COST = 5;
+
+export function purchaseHint(problemId: string): { success: boolean; state: GameState } {
+  const state = getState();
+  if (state.purchasedHints.includes(problemId)) return { success: true, state };
+  if (state.currency < HINT_COST) return { success: false, state };
+  state.currency -= HINT_COST;
+  state.purchasedHints = [...state.purchasedHints, problemId];
+  saveState(state);
+  return { success: true, state };
 }

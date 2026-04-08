@@ -4,9 +4,11 @@ import { useState } from "react";
 import CodeEditor from "@/components/CodeEditor";
 import ProblemDisplay from "@/components/ProblemDisplay";
 import TestResults from "@/components/TestResults";
-import { getDailyChoices, Problem, Difficulty } from "@/lib/problems";
+import { getDailyChoices, Problem, Difficulty, PROBLEMS } from "@/lib/problems";
 import { runTests, TestResult } from "@/lib/judge0";
-import { getState, recordSolve } from "@/lib/storage";
+import { getState, recordSolve, purchaseHint, HINT_COST } from "@/lib/storage";
+import { HINTS } from "@/lib/hints";
+import { playSolveSound, playCoinSound, playHintSound, playClickSound } from "@/lib/sounds";
 
 interface SolveModalProps {
   onClose: () => void;
@@ -37,11 +39,46 @@ export default function SolveModal({ onClose, onSolved }: SolveModalProps) {
   const [submitting, setSubmitting] = useState(false);
   const [solved, setSolved] = useState(false);
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
+  const [hintUnlocked, setHintUnlocked] = useState(false);
+  const [showHint, setShowHint] = useState(false);
 
   function selectDifficulty(difficulty: Difficulty) {
+    playClickSound();
     const problem = choices[difficulty];
+    const state = getState();
     setSelectedProblem(problem);
     setCode(problem.starterCode);
+    setResults(null);
+    setSolved(false);
+    setStatusMsg(null);
+    setHintUnlocked(state.purchasedHints.includes(problem.id));
+    setShowHint(false);
+  }
+
+  function handleHint() {
+    if (!selectedProblem) return;
+    if (hintUnlocked) { setShowHint(v => !v); return; }
+    const { success, state } = purchaseHint(selectedProblem.id);
+    if (success) {
+      playHintSound();
+      setHintUnlocked(true);
+      setShowHint(true);
+      onSolved(null);
+    } else {
+      setStatusMsg(`Need ${HINT_COST} coins for a hint!`);
+      setTimeout(() => setStatusMsg(null), 1500);
+    }
+  }
+
+  function reroll() {
+    if (!selectedProblem) return;
+    const state = getState();
+    const pool = PROBLEMS.filter(
+      (p) => p.difficulty === selectedProblem.difficulty && p.id !== selectedProblem.id && !state.solvedProblems.includes(p.id)
+    );
+    const next = pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : selectedProblem;
+    setSelectedProblem(next);
+    setCode(next.starterCode);
     setResults(null);
     setSolved(false);
     setStatusMsg(null);
@@ -59,7 +96,9 @@ export default function SolveModal({ onClose, onSolved }: SolveModalProps) {
 
       const allPassed = testResults.every((r) => r.passed);
       if (allPassed && !solved) {
-        const { newCat } = recordSolve(selectedProblem.id, selectedProblem.category, selectedProblem.difficulty);
+        const { newCat } = recordSolve(selectedProblem.id, selectedProblem.category, selectedProblem.difficulty, selectedProblem.title, code);
+        playSolveSound();
+        playCoinSound();
         setSolved(true);
         setStatusMsg(`+${REWARD_MAP[selectedProblem.difficulty]} coins! Great job!`);
         onSolved(newCat);
@@ -168,6 +207,21 @@ export default function SolveModal({ onClose, onSolved }: SolveModalProps) {
           </div>
           <div className="flex items-center gap-3">
             <button
+              onClick={handleHint}
+              disabled={solved}
+              className="px-4 py-1.5 bg-purple-500 hover:bg-purple-400 disabled:bg-gray-400 rounded font-medium text-sm transition-colors text-white"
+              title={hintUnlocked ? "Show/hide hint" : `Unlock hint (${HINT_COST} coins)`}
+            >
+              {hintUnlocked ? (showHint ? "Hide Hint" : "Show Hint") : `Hint (${HINT_COST} 🪙)`}
+            </button>
+            <button
+              onClick={reroll}
+              disabled={solved}
+              className="px-4 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-yellow-900 disabled:bg-gray-400 rounded font-medium text-sm transition-colors"
+            >
+              Reroll
+            </button>
+            <button
               onClick={handleSubmit}
               disabled={submitting || solved}
               className="px-4 py-1.5 bg-green-500 hover:bg-green-600 disabled:bg-gray-400 rounded font-medium text-sm transition-colors"
@@ -186,8 +240,14 @@ export default function SolveModal({ onClose, onSolved }: SolveModalProps) {
         {/* Content: problem left, editor + results right */}
         <div className="flex-1 flex min-h-0">
           {/* Problem panel */}
-          <div className="w-1/2 border-r border-purple-200 overflow-y-auto">
+          <div className="w-1/2 border-r border-purple-200 overflow-y-auto flex flex-col">
             <ProblemDisplay problem={selectedProblem} />
+            {showHint && HINTS[selectedProblem.id] && (
+              <div className="mx-4 mb-4 p-3 bg-purple-50 border-2 border-purple-200 rounded-xl">
+                <p className="text-xs font-bold text-purple-700 mb-1">Hint</p>
+                <p className="text-xs text-purple-900">{HINTS[selectedProblem.id]}</p>
+              </div>
+            )}
           </div>
 
           {/* Editor + results panel */}

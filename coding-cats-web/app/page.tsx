@@ -10,6 +10,10 @@ import ShopModal from "@/components/ShopModal";
 import FieldCat from "@/components/FieldCat";
 import FieldFlowers from "@/components/FieldFlowers";
 import LofiPlayer from "@/components/LofiPlayer";
+import CheatSheetModal from "@/components/CheatSheetModal";
+import AboutModal from "@/components/AboutModal";
+import HatShopModal from "@/components/HatShopModal";
+import HistoryModal from "@/components/HistoryModal";
 
 const CATEGORY_LABELS: Record<Category, string> = {
   arrays: "Arrays",
@@ -36,6 +40,10 @@ export default function Home() {
   const [previewPos, setPreviewPos] = useState<{ x: number; y: number } | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [newCatUnlock, setNewCatUnlock] = useState<Category | null>(null);
+  const [showCheatSheet, setShowCheatSheet] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
+  const [showHatShop, setShowHatShop] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
   useEffect(() => {
     initState().then((s) => {
@@ -95,7 +103,7 @@ export default function Home() {
       />
 
       {/* Top bar */}
-      <div className="absolute top-2 left-2 right-2 z-10 flex items-center justify-between px-4 py-0.5 bg-yellow-800 border-4 border-yellow-600 rounded-3xl shadow-2xl">
+      <div className="absolute top-2 left-2 right-2 z-10 flex items-center justify-between px-4 py-0.5 bg-yellow-800 border-4 border-yellow-600 rounded-3xl">
         <span className="text-white text-2xl" style={{ fontFamily: "var(--font-press-start)" }}>Coding Cats</span>
         <div className="flex items-center gap-3 text-white relative">
 
@@ -119,20 +127,44 @@ export default function Home() {
               <img src="/sprites/settings-button.png" alt="settings" width={80} height={80} style={{ imageRendering: "pixelated" }} />
             </button>
             {showSettings && (
-              <div className="absolute right-0 top-12 flex flex-col gap-2 bg-amber-900/90 border-2 border-amber-700 rounded-xl p-3 min-w-[160px] z-20">
+              <div className="absolute right-0 top-12 flex flex-col gap-2 bg-amber-900/90 border-2 border-amber-700 rounded-xl p-3 min-w-[160px] z-20 items-center">
                 <button
                   onClick={() => { setShowShop(true); setShowSettings(false); }}
-                  className="px-3 py-1.5 bg-green-500 hover:bg-green-400 rounded text-sm font-medium transition-colors text-white"
+                  className="w-full px-3 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-yellow-900 rounded text-sm font-medium transition-colors text-center"
                 >
                   Shop
                 </button>
                 <button
                   onClick={() => { setShowSolve(true); setShowSettings(false); }}
-                  className="px-3 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-yellow-900 rounded text-sm font-medium transition-colors"
+                  className="w-full px-3 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-yellow-900 rounded text-sm font-medium transition-colors text-center"
                 >
                   + More Problems
                 </button>
                 <TrackerDropdown categoryProgress={state.categoryProgress} />
+                <button
+                  onClick={() => { setShowCheatSheet(true); setShowSettings(false); }}
+                  className="w-full px-3 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-yellow-900 rounded text-sm font-medium transition-colors text-center"
+                >
+                  Cheat Sheet
+                </button>
+                <button
+                  onClick={() => { setShowHatShop(true); setShowSettings(false); }}
+                  className="w-full px-3 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-yellow-900 rounded text-sm font-medium transition-colors text-center"
+                >
+                  Cat Hats
+                </button>
+                <button
+                  onClick={() => { setShowHistory(true); setShowSettings(false); }}
+                  className="w-full px-3 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-yellow-900 rounded text-sm font-medium transition-colors text-center"
+                >
+                  History
+                </button>
+                <button
+                  onClick={() => { setShowAbout(true); setShowSettings(false); }}
+                  className="w-full px-3 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-yellow-900 rounded text-sm font-medium transition-colors text-center"
+                >
+                  About
+                </button>
               </div>
             )}
           </div>
@@ -156,7 +188,7 @@ export default function Home() {
         <FieldFlowers placedItems={state.placedItems} />
 
         {/* Main cat */}
-        <FieldCat />
+        <FieldCat hat={state.equippedHat} />
 
         {/* Extra cats for each unlocked category */}
         {unlockedCategories.map((cat) => (
@@ -195,6 +227,30 @@ export default function Home() {
           onClose={() => setShowShop(false)}
           onPurchase={handlePurchase}
           currency={state.currency}
+        />
+      )}
+
+      {/* Cheat sheet modal */}
+      {showCheatSheet && <CheatSheetModal onClose={() => setShowCheatSheet(false)} />}
+
+      {/* About modal */}
+      {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
+
+      {/* Hat shop modal */}
+      {showHatShop && state && (
+        <HatShopModal
+          onClose={() => setShowHatShop(false)}
+          onEquip={refreshState}
+          currency={state.currency}
+          equippedHat={state.equippedHat}
+        />
+      )}
+
+      {/* History modal */}
+      {showHistory && state && (
+        <HistoryModal
+          history={state.solvedHistory ?? []}
+          onClose={() => setShowHistory(false)}
         />
       )}
 
