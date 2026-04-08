@@ -9,6 +9,7 @@ import SolveModal from "@/components/SolveModal";
 import ShopModal from "@/components/ShopModal";
 import FieldCat from "@/components/FieldCat";
 import FieldFlowers from "@/components/FieldFlowers";
+import LofiPlayer from "@/components/LofiPlayer";
 
 const CATEGORY_LABELS: Record<Category, string> = {
   arrays: "Arrays",
@@ -94,9 +95,11 @@ export default function Home() {
       />
 
       {/* Top bar */}
-      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-2 bg-black/20">
-        <span className="text-white font-bold text-4xl">Coding Cats</span>
+      <div className="absolute top-2 left-2 right-2 z-10 flex items-center justify-between px-4 py-0.5 bg-yellow-800 border-4 border-yellow-600 rounded-3xl shadow-2xl">
+        <span className="text-white text-2xl" style={{ fontFamily: "var(--font-press-start)" }}>Coding Cats</span>
         <div className="flex items-center gap-3 text-white relative">
+
+          <LofiPlayer />
 
           {/* Currency */}
           <div className="flex items-center gap-1.5">

@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
-import { Geist_Mono } from "next/font/google";
+import { Geist_Mono, Press_Start_2P } from "next/font/google";
 import "./globals.css";
 
 const mono = Geist_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
+});
+
+const pressStart = Press_Start_2P({
+  variable: "--font-press-start",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -19,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${mono.variable} antialiased bg-purple-50 min-h-screen`}>
+      <body className={`${mono.variable} ${pressStart.variable} antialiased bg-purple-50 min-h-screen`} style={{ fontFamily: "var(--font-press-start)" }}>
         {children}
       </body>
     </html>
