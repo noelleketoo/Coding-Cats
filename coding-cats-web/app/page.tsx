@@ -224,9 +224,10 @@ export default function Home() {
       {/* Shop modal */}
       {showShop && (
         <ShopModal
-          onClose={() => setShowShop(false)}
+          onClose={() => { setShowShop(false); refreshState(); }}
           onPurchase={handlePurchase}
           currency={state.currency}
+          equippedHat={state.equippedHat}
         />
       )}
 
