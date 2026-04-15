@@ -64,10 +64,24 @@ const SECTIONS: Section[] = [
     title: "Control Flow",
     items: [
       { label: "If / elif / else", code: "if x > 0:\n    ...\nelif x == 0:\n    ...\nelse:\n    ..." },
-      { label: "For loop", code: "for i in range(n):\n    ..." },
-      { label: "For over list", code: "for item in items:\n    ..." },
-      { label: "While loop", code: "while x > 0:\n    x -= 1" },
-      { label: "Break / Continue", code: "break  # exit loop\ncontinue  # skip iteration" },
+      { label: "Ternary", code: "val = 'yes' if x > 0 else 'no'" },
+      { label: "and / or / not", code: "if x > 0 and y > 0:\nif not flag:" },
+    ],
+  },
+  {
+    title: "Loops",
+    items: [
+      { label: "For range", code: "for i in range(5):      # 0-4\nfor i in range(1, 6):  # 1-5\nfor i in range(0,10,2):# 0,2,4..." },
+      { label: "For over list", code: "for item in items:\n    print(item)" },
+      { label: "Enumerate", code: "for i, val in enumerate(items):\n    print(i, val)" },
+      { label: "Zip", code: "for a, b in zip(list1, list2):\n    print(a, b)" },
+      { label: "While", code: "while x > 0:\n    x -= 1" },
+      { label: "While + flag", code: "found = False\nwhile not found:\n    ..." },
+      { label: "Nested loops", code: "for i in range(3):\n    for j in range(3):\n        print(i, j)" },
+      { label: "Break", code: "for i in range(10):\n    if i == 5:\n        break  # stop loop" },
+      { label: "Continue", code: "for i in range(10):\n    if i % 2 == 0:\n        continue  # skip even" },
+      { label: "List comprehension", code: "[x*2 for x in nums]\n[x for x in nums if x > 0]" },
+      { label: "Dict comprehension", code: "{k: v for k, v in d.items()}" },
     ],
   },
   {

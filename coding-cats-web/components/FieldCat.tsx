@@ -171,11 +171,11 @@ export default function FieldCat({ initialX = 50, hatSrc = null }: { initialX?: 
           alt="hat"
           style={{
             position: "absolute",
-            top: -4,
+            top: 1,
             left: "50%",
             transform: "translateX(-50%)",
-            width: 14,
-            height: 14,
+            width: 11,
+            height: 11,
             imageRendering: "pixelated",
             pointerEvents: "none",
           }}
