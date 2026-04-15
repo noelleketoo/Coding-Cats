@@ -78,15 +78,7 @@ const STATE_FRAMES: Record<CatState, { x: number; y: number }[]> = {
   running: RUN_FRAMES,
 };
 
-const HAT_EMOJIS: Record<string, string> = {
-  "party-hat": "🎉",
-  "witch-hat": "🧙",
-  "crown": "👑",
-  "bow": "🎀",
-  "santa-hat": "🎅",
-};
-
-export default function FieldCat({ initialX = 50, hat = null }: { initialX?: number; hat?: string | null }) {
+export default function FieldCat({ initialX = 50, hatSrc = null }: { initialX?: number; hatSrc?: string | null }) {
   const [posX, setPosX] = useState(initialX);
   const [frame, setFrame] = useState(0);
   const [catState, setCatState] = useState<CatState>("idle");
@@ -173,10 +165,21 @@ export default function FieldCat({ initialX = 50, hat = null }: { initialX?: num
         scale: "2.5",
       }}
     >
-      {hat && HAT_EMOJIS[hat] && (
-        <div style={{ position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)", fontSize: 14, lineHeight: 1 }}>
-          {HAT_EMOJIS[hat]}
-        </div>
+      {hatSrc && (
+        <img
+          src={hatSrc}
+          alt="hat"
+          style={{
+            position: "absolute",
+            top: -10,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: 28,
+            height: 28,
+            imageRendering: "pixelated",
+            pointerEvents: "none",
+          }}
+        />
       )}
     </div>
   );

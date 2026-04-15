@@ -24,7 +24,7 @@ export interface GameState {
   lastSolveDate: string;
   purchasedItems: Record<string, number>; // itemId -> count owned
   placedItems: PlacedItem[];
-  equippedHat: string | null;
+  catHats: Record<string, string>; // catId ("main"|category) -> hatId
   purchasedHints: string[];
   solvedHistory: SolvedEntry[];
 }
@@ -45,7 +45,7 @@ const DEFAULT_STATE: GameState = {
   lastSolveDate: "",
   purchasedItems: {},
   placedItems: [],
-  equippedHat: null,
+  catHats: {},
   purchasedHints: [],
   solvedHistory: [],
 };
@@ -89,7 +89,7 @@ async function loadFromSupabase(): Promise<GameState | null> {
     lastSolveDate: data.last_solve_date ?? "",
     purchasedItems: data.purchased_items ?? {},
     placedItems: data.placed_items ?? [],
-    equippedHat: data.equipped_hat ?? null,
+    catHats: data.cat_hats ?? {},
     purchasedHints: data.purchased_hints ?? [],
     solvedHistory: data.solved_history ?? [],
   };
@@ -109,7 +109,7 @@ async function saveToSupabase(state: GameState): Promise<void> {
     last_solve_date: state.lastSolveDate,
     purchased_items: state.purchasedItems,
     placed_items: state.placedItems,
-    equipped_hat: state.equippedHat,
+    cat_hats: state.catHats,
     purchased_hints: state.purchasedHints,
     solved_history: state.solvedHistory,
     updated_at: new Date().toISOString(),
@@ -127,11 +127,9 @@ export function getState(): GameState {
 
 function saveState(state: GameState) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  // Fire-and-forget sync to Supabase
   saveToSupabase(state).catch(() => {});
 }
 
-// Call this once on app load to pull state from Supabase and sync locally
 export async function initState(): Promise<GameState> {
   const remote = await loadFromSupabase();
   if (remote) {
@@ -141,7 +139,7 @@ export async function initState(): Promise<GameState> {
   return getState();
 }
 
-// --- Game logic (unchanged) ---
+// --- Game logic ---
 
 export function hasSolvedToday(): boolean {
   if (typeof window === "undefined") return false;
@@ -208,9 +206,13 @@ export function removeLastPlaced(itemId: string): GameState {
   return state;
 }
 
-export function equipHat(hatId: string | null): GameState {
+export function setCatHat(catId: string, hatId: string | null): GameState {
   const state = getState();
-  state.equippedHat = hatId;
+  if (hatId === null) {
+    delete state.catHats[catId];
+  } else {
+    state.catHats = { ...state.catHats, [catId]: hatId };
+  }
   saveState(state);
   return state;
 }

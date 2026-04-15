@@ -10,9 +10,9 @@ import ShopModal from "@/components/ShopModal";
 import FieldCat from "@/components/FieldCat";
 import FieldFlowers from "@/components/FieldFlowers";
 import LofiPlayer from "@/components/LofiPlayer";
+import { getHat } from "@/lib/hats";
 import CheatSheetModal from "@/components/CheatSheetModal";
 import AboutModal from "@/components/AboutModal";
-import HatShopModal from "@/components/HatShopModal";
 import HistoryModal from "@/components/HistoryModal";
 
 const CATEGORY_LABELS: Record<Category, string> = {
@@ -42,7 +42,6 @@ export default function Home() {
   const [newCatUnlock, setNewCatUnlock] = useState<Category | null>(null);
   const [showCheatSheet, setShowCheatSheet] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
-  const [showHatShop, setShowHatShop] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
   useEffect(() => {
@@ -182,11 +181,11 @@ export default function Home() {
         <FieldFlowers placedItems={state.placedItems} />
 
         {/* Main cat */}
-        <FieldCat hat={state.equippedHat} />
+        <FieldCat hatSrc={state.catHats?.main ? getHat(state.catHats.main)?.imageSrc ?? null : null} />
 
         {/* Extra cats for each unlocked category */}
         {unlockedCategories.map((cat) => (
-          <FieldCat key={cat} initialX={CAT_POSITIONS[cat]} />
+          <FieldCat key={cat} initialX={CAT_POSITIONS[cat]} hatSrc={state.catHats?.[cat] ? getHat(state.catHats[cat])?.imageSrc ?? null : null} />
         ))}
 
         {/* Placement preview */}
@@ -221,7 +220,8 @@ export default function Home() {
           onClose={() => { setShowShop(false); refreshState(); }}
           onPurchase={handlePurchase}
           currency={state.currency}
-          equippedHat={state.equippedHat}
+          equippedHats={state.catHats ?? {}}
+          unlockedCategories={unlockedCategories}
         />
       )}
 
@@ -231,17 +231,7 @@ export default function Home() {
       {/* About modal */}
       {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
 
-      {/* Hat shop modal */}
-      {showHatShop && state && (
-        <HatShopModal
-          onClose={() => setShowHatShop(false)}
-          onEquip={refreshState}
-          currency={state.currency}
-          equippedHat={state.equippedHat}
-        />
-      )}
-
-      {/* History modal */}
+{/* History modal */}
       {showHistory && state && (
         <HistoryModal
           history={state.solvedHistory ?? []}
