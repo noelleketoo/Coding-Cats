@@ -215,7 +215,7 @@ export function equipHat(hatId: string | null): GameState {
   return state;
 }
 
-export const HINT_COST = 5;
+export const HINT_COST = 0;
 
 export function purchaseHint(problemId: string): { success: boolean; state: GameState } {
   const state = getState();

@@ -147,13 +147,7 @@ export default function Home() {
                 >
                   Cheat Sheet
                 </button>
-                <button
-                  onClick={() => { setShowHatShop(true); setShowSettings(false); }}
-                  className="w-full px-3 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-yellow-900 rounded text-sm font-medium transition-colors text-center"
-                >
-                  Cat Hats
-                </button>
-                <button
+<button
                   onClick={() => { setShowHistory(true); setShowSettings(false); }}
                   className="w-full px-3 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-yellow-900 rounded text-sm font-medium transition-colors text-center"
                 >

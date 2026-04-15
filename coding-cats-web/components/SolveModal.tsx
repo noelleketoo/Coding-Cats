@@ -58,7 +58,7 @@ export default function SolveModal({ onClose, onSolved }: SolveModalProps) {
   function handleHint() {
     if (!selectedProblem) return;
     if (hintUnlocked) { setShowHint(v => !v); return; }
-    const { success, state } = purchaseHint(selectedProblem.id);
+    const { success } = purchaseHint(selectedProblem.id);
     if (success) {
       playHintSound();
       setHintUnlocked(true);
@@ -212,7 +212,7 @@ export default function SolveModal({ onClose, onSolved }: SolveModalProps) {
               className="px-4 py-1.5 bg-purple-500 hover:bg-purple-400 disabled:bg-gray-400 rounded font-medium text-sm transition-colors text-white"
               title={hintUnlocked ? "Show/hide hint" : `Unlock hint (${HINT_COST} coins)`}
             >
-              {hintUnlocked ? (showHint ? "Hide Hint" : "Show Hint") : `Hint (${HINT_COST} 🪙)`}
+              {showHint ? "Hide Hint" : "Hint"}
             </button>
             <button
               onClick={reroll}
