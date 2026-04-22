@@ -999,6 +999,221 @@ group_by_letter(names)
 `,
   },
 
+  // ===== MEDIUM (additional) =====
+  {
+    id: "valid-anagram",
+    title: "Valid Anagram",
+    category: "strings",
+    difficulty: "medium",
+    description:
+      'Mochi the calico mixed up two cat breed names. Given strings `s` and `t`, print `"True"` if `t` is an anagram of `s` (uses exactly the same letters in any order, same count), otherwise print `"False"`.',
+    examples: [
+      { input: 's = "anagram", t = "nagaram"', output: "True", explanation: "Same letters, rearranged." },
+      { input: 's = "rat", t = "car"', output: "False" },
+    ],
+    testCases: [
+      { input: "anagram\nnagaram", expected: "True" },
+      { input: "rat\ncar", expected: "False" },
+      { input: "listen\nsilent", expected: "True" },
+      { input: "cat\ncats", expected: "False" },
+    ],
+    starterCode: `def is_anagram(s, t):
+    # Your code here
+    pass
+
+s = input()
+t = input()
+print(is_anagram(s, t))
+`,
+  },
+  {
+    id: "missing-catnip",
+    title: "Missing Catnip",
+    category: "math",
+    difficulty: "medium",
+    description:
+      "Cookie counted her catnip toys but one is missing! Given a list containing `n` distinct numbers taken from the range `[0, n]`, find and print the one number that is missing.",
+    examples: [
+      { input: "nums = [3, 0, 1]", output: "2", explanation: "Numbers 0-3 expected; 2 is missing." },
+      { input: "nums = [0, 1]", output: "2" },
+    ],
+    testCases: [
+      { input: "[3, 0, 1]", expected: "2" },
+      { input: "[0, 1]", expected: "2" },
+      { input: "[9, 6, 4, 2, 3, 5, 7, 0, 1]", expected: "8" },
+      { input: "[0]", expected: "1" },
+    ],
+    starterCode: `def find_missing(nums):
+    # Your code here
+    pass
+
+nums = eval(input())
+print(find_missing(nums))
+`,
+  },
+  {
+    id: "binary-search",
+    title: "Binary Search",
+    category: "arrays",
+    difficulty: "medium",
+    description:
+      "Luna learned a new trick: binary search! Given a **sorted** list of integers and a target value, print the index of the target. If the target is not in the list, print `-1`.",
+    examples: [
+      { input: "nums = [-1, 0, 3, 5, 9, 12], target = 9", output: "4" },
+      { input: "nums = [-1, 0, 3, 5, 9, 12], target = 2", output: "-1" },
+    ],
+    testCases: [
+      { input: "[-1, 0, 3, 5, 9, 12]\n9", expected: "4" },
+      { input: "[-1, 0, 3, 5, 9, 12]\n2", expected: "-1" },
+      { input: "[5]\n5", expected: "0" },
+      { input: "[1, 3, 5, 7]\n3", expected: "1" },
+    ],
+    starterCode: `def binary_search(nums, target):
+    # Your code here
+    pass
+
+nums = eval(input())
+target = int(input())
+print(binary_search(nums, target))
+`,
+  },
+  {
+    id: "rotate-array",
+    title: "Rotate Array",
+    category: "arrays",
+    difficulty: "medium",
+    description:
+      "Mochi is spinning! Given a list of integers `nums` and a non-negative integer `k`, rotate the array to the right by `k` steps. Print the result as space-separated integers.",
+    examples: [
+      {
+        input: "nums = [1, 2, 3, 4, 5, 6, 7], k = 3",
+        output: "5 6 7 1 2 3 4",
+        explanation: "Shift right 3 steps: last 3 elements move to the front.",
+      },
+      { input: "nums = [1, 2], k = 3", output: "2 1" },
+    ],
+    testCases: [
+      { input: "[1, 2, 3, 4, 5, 6, 7]\n3", expected: "5 6 7 1 2 3 4" },
+      { input: "[1, 2]\n3", expected: "2 1" },
+      { input: "[1, 2, 3]\n0", expected: "1 2 3" },
+      { input: "[-1, -100, 3, 99]\n2", expected: "3 99 -1 -100" },
+    ],
+    starterCode: `def rotate(nums, k):
+    # Your code here
+    pass
+
+nums = eval(input())
+k = int(input())
+result = rotate(nums, k)
+print(*result)
+`,
+  },
+  {
+    id: "top-k-frequent",
+    title: "Top K Frequent",
+    category: "hashmap",
+    difficulty: "medium",
+    description:
+      "The cat café is tallying their most popular treats! Given a list of integers `nums` and a number `k`, print the `k` most frequent elements. If two elements have the same frequency, print the smaller number first. Print them space-separated.",
+    examples: [
+      { input: "nums = [1, 1, 1, 2, 2, 3], k = 2", output: "1 2", explanation: "1 appears 3 times, 2 appears 2 times." },
+      { input: "nums = [4, 4, 4, 3, 3, 2, 2, 2], k = 2", output: "2 4", explanation: "Both appear 3 times — smaller first." },
+    ],
+    testCases: [
+      { input: "[1, 1, 1, 2, 2, 3]\n2", expected: "1 2" },
+      { input: "[1]\n1", expected: "1" },
+      { input: "[4, 4, 4, 3, 3, 2, 2, 2]\n2", expected: "2 4" },
+      { input: "[1, 2, 3, 3, 2, 1, 1]\n2", expected: "1 2" },
+    ],
+    starterCode: `def top_k_frequent(nums, k):
+    # Your code here
+    pass
+
+nums = eval(input())
+k = int(input())
+result = top_k_frequent(nums, k)
+print(*result)
+`,
+  },
+  {
+    id: "longest-palindrome-sub",
+    title: "Longest Palindromic Substring",
+    category: "strings",
+    difficulty: "medium",
+    description:
+      "Mittens loves words that read the same forwards and backwards! Given a string `s`, find and print the longest substring that is a palindrome. If multiple substrings tie for the longest, print the one that starts earliest.",
+    examples: [
+      { input: 's = "babad"', output: "bab", explanation: '"bab" and "aba" are both valid — "bab" starts first.' },
+      { input: 's = "cbbd"', output: "bb" },
+    ],
+    testCases: [
+      { input: "babad", expected: "bab" },
+      { input: "cbbd", expected: "bb" },
+      { input: "racecar", expected: "racecar" },
+      { input: "abcd", expected: "a" },
+    ],
+    starterCode: `def longest_palindrome(s):
+    # Your code here
+    pass
+
+s = input()
+print(longest_palindrome(s))
+`,
+  },
+  {
+    id: "three-sum",
+    title: "Three Sum",
+    category: "arrays",
+    difficulty: "medium",
+    description:
+      "Pixel is juggling three number balls! Given a list of integers `nums`, find all **unique** triplets `[a, b, c]` such that `a + b + c = 0`.\n\nPrint each triplet sorted in ascending order, one per line, with numbers separated by spaces. Print triplets in sorted order (by first element, then second).",
+    examples: [
+      {
+        input: "nums = [-1, 0, 1, 2, -1, -4]",
+        output: "-1 -1 2\n-1 0 1",
+      },
+      { input: "nums = [0, 0, 0]", output: "0 0 0" },
+    ],
+    testCases: [
+      { input: "[-1, 0, 1, 2, -1, -4]", expected: "-1 -1 2\n-1 0 1" },
+      { input: "[0, 0, 0]", expected: "0 0 0" },
+      { input: "[-2, 0, 1, 1, 2]", expected: "-2 0 2\n-2 1 1" },
+      { input: "[-4, -1, -1, 0, 1, 2]", expected: "-1 -1 2\n-1 0 1" },
+    ],
+    starterCode: `def three_sum(nums):
+    # Your code here
+    pass
+
+nums = eval(input())
+three_sum(nums)
+`,
+  },
+  {
+    id: "decode-string",
+    title: "Decode Cat Message",
+    category: "strings",
+    difficulty: "medium",
+    description:
+      "Cipher the cat encrypted her meow pattern! Given an encoded string where `k[str]` means `str` is repeated `k` times, decode and print the full string. Brackets can be nested.",
+    examples: [
+      { input: 's = "3[a]2[bc]"', output: "aaabcbc" },
+      { input: 's = "2[a2[b]]"', output: "abbabb", explanation: "Inner 2[b]=bb, then 2[a+bb]=abbabb." },
+    ],
+    testCases: [
+      { input: "3[a]2[bc]", expected: "aaabcbc" },
+      { input: "2[ab]3[c]", expected: "ababccc" },
+      { input: "2[a2[b]]", expected: "abbabb" },
+      { input: "3[x]", expected: "xxx" },
+    ],
+    starterCode: `def decode_string(s):
+    # Your code here
+    pass
+
+s = input()
+print(decode_string(s))
+`,
+  },
+
   // ===== HARD =====
   {
     id: "longest-substring",
@@ -1207,6 +1422,141 @@ weights = eval(input())
 values = eval(input())
 capacity = int(input())
 print(max_tastiness(weights, values, capacity))
+`,
+  },
+  {
+    id: "word-break",
+    title: "Word Break",
+    category: "dp",
+    difficulty: "hard",
+    description:
+      'Luna is reading a book written in CatScript where all spaces are removed! Given a string `s` and a list of dictionary words, print `"True"` if `s` can be segmented into a sequence of one or more dictionary words, otherwise print `"False"`.',
+    examples: [
+      { input: 's = "leetcode", words = ["leet", "code"]', output: "True", explanation: '"leet" + "code" = "leetcode"' },
+      { input: 's = "catsandog", words = ["cats", "dog", "sand", "and", "an"]', output: "False" },
+    ],
+    testCases: [
+      { input: "leetcode\n[\"leet\", \"code\"]", expected: "True" },
+      { input: "applepenapple\n[\"apple\", \"pen\"]", expected: "True" },
+      { input: "catsandog\n[\"cats\", \"dog\", \"sand\", \"and\", \"an\"]", expected: "False" },
+      { input: "cats\n[\"cat\", \"cats\", \"and\", \"sand\"]", expected: "True" },
+    ],
+    starterCode: `def word_break(s, word_dict):
+    # Your code here
+    pass
+
+s = input()
+word_dict = eval(input())
+print(word_break(s, word_dict))
+`,
+  },
+  {
+    id: "cat-edit-distance",
+    title: "Cat Edit Distance",
+    category: "dp",
+    difficulty: "hard",
+    description:
+      "Whiskers is learning to type but keeps making mistakes! Given two strings `word1` and `word2`, print the minimum number of single-character operations (insert, delete, or replace) needed to transform `word1` into `word2`.",
+    examples: [
+      { input: 'word1 = "horse", word2 = "ros"', output: "3", explanation: "horse→rorse→rose→ros" },
+      { input: 'word1 = "intention", word2 = "execution"', output: "5" },
+    ],
+    testCases: [
+      { input: "horse\nros", expected: "3" },
+      { input: "intention\nexecution", expected: "5" },
+      { input: "abc\nabc", expected: "0" },
+      { input: "cat\n", expected: "3" },
+    ],
+    starterCode: `def edit_distance(word1, word2):
+    # Your code here
+    pass
+
+word1 = input()
+word2 = input()
+print(edit_distance(word1, word2))
+`,
+  },
+  {
+    id: "trapping-rain-water",
+    title: "Trapping Rain Water",
+    category: "arrays",
+    difficulty: "hard",
+    description:
+      "It's raining in cat town! Given a list of non-negative integers representing an elevation map where each bar has width 1, compute how much water can be trapped between the bars after it rains. Print the total amount of water trapped.",
+    examples: [
+      {
+        input: "height = [0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]",
+        output: "6",
+      },
+      { input: "height = [4, 2, 0, 3, 2, 5]", output: "9" },
+    ],
+    testCases: [
+      { input: "[0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]", expected: "6" },
+      { input: "[4, 2, 0, 3, 2, 5]", expected: "9" },
+      { input: "[1, 0, 1]", expected: "1" },
+      { input: "[3, 0, 3]", expected: "3" },
+    ],
+    starterCode: `def trap(height):
+    # Your code here
+    pass
+
+height = eval(input())
+print(trap(height))
+`,
+  },
+  {
+    id: "min-window-substring",
+    title: "Min Window Substring",
+    category: "hashmap",
+    difficulty: "hard",
+    description:
+      "Nala needs to find the shortest section of her hunting log that contains all target prey types! Given strings `s` and `t`, print the minimum window substring of `s` such that every character in `t` (including duplicates) is in the window. If no such window exists, print an empty line.",
+    examples: [
+      {
+        input: 's = "ADOBECODEBANC", t = "ABC"',
+        output: "BANC",
+        explanation: "The shortest window containing A, B, and C.",
+      },
+      { input: 's = "a", t = "b"', output: "" },
+    ],
+    testCases: [
+      { input: "ADOBECODEBANC\nABC", expected: "BANC" },
+      { input: "a\na", expected: "a" },
+      { input: "a\nb", expected: "" },
+      { input: "abc\nbc", expected: "bc" },
+    ],
+    starterCode: `def min_window(s, t):
+    # Your code here
+    pass
+
+s = input()
+t = input()
+print(min_window(s, t))
+`,
+  },
+  {
+    id: "cat-decode-ways",
+    title: "Cat Decode Ways",
+    category: "dp",
+    difficulty: "hard",
+    description:
+      "Pixel encrypted her purr sequence using numbers: `A=1, B=2, ..., Z=26`. Given a string of digits, print the total number of ways to decode it into letters. A leading zero or an isolated zero makes that path invalid.",
+    examples: [
+      { input: 's = "12"', output: "2", explanation: '"AB" (1,2) or "L" (12)' },
+      { input: 's = "226"', output: "3", explanation: '"BBF", "BZ", or "VF"' },
+    ],
+    testCases: [
+      { input: "12", expected: "2" },
+      { input: "226", expected: "3" },
+      { input: "0", expected: "0" },
+      { input: "11106", expected: "2" },
+    ],
+    starterCode: `def num_decodings(s):
+    # Your code here
+    pass
+
+s = input()
+print(num_decodings(s))
 `,
   },
 ];

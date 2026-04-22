@@ -65,4 +65,21 @@ export const HINTS: Record<string, string> = {
   "cat-nap-scheduler": "Sort naps by end time. Greedily pick naps that end earliest and don't overlap.",
   "cat-string-compression": "Loop through the string tracking the current character and its count. When the character changes, write char+count.",
   "cat-treat-budget": "Classic 0/1 knapsack: dp[w] = max tastiness using capacity w. Loop items, loop capacity backwards.",
+
+  // New Medium
+  "valid-anagram": "Count character frequencies in both strings using a dictionary or Counter. If the counts match, they're anagrams.",
+  "missing-catnip": "The sum of 0 to n is n*(n+1)//2. Subtract the actual sum of the list to find the missing number.",
+  "binary-search": "Keep a left and right pointer. At each step check the midpoint: if nums[mid] == target return mid, if too small move left up, if too big move right down.",
+  "rotate-array": "Use the modulo operator: effective_k = k % len(nums). Then slice: result = nums[-effective_k:] + nums[:-effective_k].",
+  "top-k-frequent": "Use a dictionary to count frequencies. Sort by (-count, num) to break ties by smaller number. Return the first k elements.",
+  "longest-palindrome-sub": "Expand around each center. For each index i, expand outward checking s[l]==s[r]. Try both odd-length (center at i) and even-length (center between i and i+1) palindromes.",
+  "three-sum": "Sort the array. Fix one element and use two pointers for the remaining two. Skip duplicate values to avoid repeats.",
+  "decode-string": "Use a stack. When you see a digit, build the number. When you see '[', push current string and multiplier onto the stack. When you see ']', pop and repeat.",
+
+  // New Hard
+  "word-break": "Use DP. dp[i] = True if s[:i] can be segmented. For each i, check all j < i where dp[j] is True and s[j:i] is in the dictionary.",
+  "cat-edit-distance": "Build a 2D dp table where dp[i][j] = edit distance between word1[:i] and word2[:j]. If chars match, dp[i][j] = dp[i-1][j-1]. Otherwise, 1 + min(insert, delete, replace).",
+  "trapping-rain-water": "Use two pointers (left and right). Track left_max and right_max. Water at each bar = min(left_max, right_max) - height[i]. Move the pointer on the side with the smaller max.",
+  "min-window-substring": "Use a sliding window with two pointers and a frequency map of t. Expand right to include needed chars, then shrink left while all chars are covered. Track the minimum window seen.",
+  "cat-decode-ways": "Use DP. dp[i] = number of ways to decode s[:i]. A single digit s[i-1] (not '0') contributes dp[i-1]. A two-digit number s[i-2:i] between 10-26 contributes dp[i-2].",
 };
