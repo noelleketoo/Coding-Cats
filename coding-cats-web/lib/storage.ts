@@ -1,5 +1,6 @@
 import { Category, Difficulty } from "./problems";
 import { supabase } from "./supabase";
+import { BADGE_MILESTONES } from "./badges";
 
 export interface PlacedItem {
   itemId: string;
@@ -27,6 +28,7 @@ export interface GameState {
   catHats: Record<string, string>; // catId ("main"|category) -> hatId
   purchasedHints: string[];
   solvedHistory: SolvedEntry[];
+  earnedBadges: number[]; // streak counts at which badges were earned
 }
 
 const STORAGE_KEY = "coding-cats-state";
@@ -48,6 +50,7 @@ const DEFAULT_STATE: GameState = {
   catHats: {},
   purchasedHints: [],
   solvedHistory: [],
+  earnedBadges: [],
 };
 
 const CURRENCY_REWARDS: Record<Difficulty, number> = {
@@ -92,6 +95,7 @@ async function loadFromSupabase(): Promise<GameState | null> {
     catHats: data.cat_hats ?? {},
     purchasedHints: data.purchased_hints ?? [],
     solvedHistory: data.solved_history ?? [],
+    earnedBadges: data.earned_badges ?? [],
   };
 }
 
@@ -112,6 +116,7 @@ async function saveToSupabase(state: GameState): Promise<void> {
     cat_hats: state.catHats,
     purchased_hints: state.purchasedHints,
     solved_history: state.solvedHistory,
+    earned_badges: state.earnedBadges,
     updated_at: new Date().toISOString(),
   }, { onConflict: "user_id" });
 }
@@ -148,10 +153,10 @@ export function hasSolvedToday(): boolean {
   return state.lastSolveDate === today;
 }
 
-export function recordSolve(problemId: string, category: Category, difficulty: Difficulty, title: string, solution: string): { state: GameState; newCat: Category | null } {
+export function recordSolve(problemId: string, category: Category, difficulty: Difficulty, title: string, solution: string): { state: GameState; newCat: Category | null; newBadge: number | null } {
   const state = getState();
 
-  if (state.solvedProblems.includes(problemId)) return { state, newCat: null };
+  if (state.solvedProblems.includes(problemId)) return { state, newCat: null, newBadge: null };
 
   state.currency += CURRENCY_REWARDS[difficulty];
 
@@ -176,8 +181,14 @@ export function recordSolve(problemId: string, category: Category, difficulty: D
 
   const newCat = state.categoryProgress[category] === 10 ? category : null;
 
+  if (!state.earnedBadges) state.earnedBadges = [];
+  const newBadge = BADGE_MILESTONES.includes(state.streak.count) && !state.earnedBadges.includes(state.streak.count)
+    ? state.streak.count
+    : null;
+  if (newBadge !== null) state.earnedBadges.push(newBadge);
+
   saveState(state);
-  return { state, newCat };
+  return { state, newCat, newBadge };
 }
 
 export function purchaseItem(itemId: string, price: number): { success: boolean; state: GameState } {

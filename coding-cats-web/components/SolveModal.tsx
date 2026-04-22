@@ -4,6 +4,7 @@ import { useState } from "react";
 import CodeEditor from "@/components/CodeEditor";
 import ProblemDisplay from "@/components/ProblemDisplay";
 import TestResults from "@/components/TestResults";
+import BadgeCelebrationModal from "@/components/BadgeCelebrationModal";
 import { getDailyChoices, Problem, Difficulty, PROBLEMS } from "@/lib/problems";
 import { runTests, TestResult } from "@/lib/judge0";
 import { getState, recordSolve, purchaseHint, HINT_COST } from "@/lib/storage";
@@ -12,7 +13,7 @@ import { playSolveSound, playCoinSound, playHintSound, playClickSound } from "@/
 
 interface SolveModalProps {
   onClose: () => void;
-  onSolved: (newCat: import("@/lib/problems").Category | null) => void;
+  onSolved: (newCat: import("@/lib/problems").Category | null, newBadge: number | null) => void;
 }
 
 const REWARD_MAP: Record<Difficulty, number> = {
@@ -41,6 +42,7 @@ export default function SolveModal({ onClose, onSolved }: SolveModalProps) {
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
   const [hintUnlocked, setHintUnlocked] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [newBadge, setNewBadge] = useState<number | null>(null);
 
   function selectDifficulty(difficulty: Difficulty) {
     playClickSound();
@@ -63,7 +65,7 @@ export default function SolveModal({ onClose, onSolved }: SolveModalProps) {
       playHintSound();
       setHintUnlocked(true);
       setShowHint(true);
-      onSolved(null);
+      onSolved(null, null);
     } else {
       setStatusMsg(`Need ${HINT_COST} coins for a hint!`);
       setTimeout(() => setStatusMsg(null), 1500);
@@ -96,16 +98,17 @@ export default function SolveModal({ onClose, onSolved }: SolveModalProps) {
 
       const allPassed = testResults.every((r) => r.passed);
       if (allPassed && !solved) {
-        const { newCat } = recordSolve(selectedProblem.id, selectedProblem.category, selectedProblem.difficulty, selectedProblem.title, code);
+        const { newCat, newBadge: badge } = recordSolve(selectedProblem.id, selectedProblem.category, selectedProblem.difficulty, selectedProblem.title, code);
         playSolveSound();
         playCoinSound();
         setSolved(true);
         setStatusMsg(`+${REWARD_MAP[selectedProblem.difficulty]} coins! Great job!`);
-        onSolved(newCat);
+        if (badge !== null) setNewBadge(badge);
+        onSolved(newCat, badge);
 
         setTimeout(() => {
           onClose();
-        }, 2500);
+        }, badge !== null ? 4500 : 2500);
       } else if (!allPassed) {
         setStatusMsg(`${testResults.filter(r => r.passed).length}/${testResults.length} tests passed. Try again!`);
       }
@@ -275,6 +278,14 @@ export default function SolveModal({ onClose, onSolved }: SolveModalProps) {
           </div>
         )}
       </div>
+
+      {/* Badge celebration popup */}
+      {newBadge !== null && (
+        <BadgeCelebrationModal
+          streak={newBadge}
+          onClose={() => setNewBadge(null)}
+        />
+      )}
     </div>
   );
 }

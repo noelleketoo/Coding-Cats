@@ -53,7 +53,7 @@ export default function Home() {
     });
   }, []);
 
-  function refreshState(newCat: Category | null = null) {
+  function refreshState(newCat: Category | null = null, _newBadge: number | null = null) {
     setState(getState());
     if (newCat) {
       setNewCatUnlock(newCat);
@@ -139,7 +139,11 @@ export default function Home() {
                 >
                   + More Problems
                 </button>
-                <TrackerDropdown categoryProgress={state.categoryProgress} />
+                <TrackerDropdown
+                  categoryProgress={state.categoryProgress}
+                  earnedBadges={state.earnedBadges ?? []}
+                  streakCount={state.streak.count}
+                />
                 <button
                   onClick={() => { setShowCheatSheet(true); setShowSettings(false); }}
                   className="w-full px-3 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-yellow-900 rounded text-sm font-medium transition-colors text-center"

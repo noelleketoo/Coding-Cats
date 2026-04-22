@@ -2,9 +2,12 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Category } from "@/lib/problems";
+import { BADGES } from "@/lib/badges";
 
 interface TrackerDropdownProps {
   categoryProgress: Record<Category, number>;
+  earnedBadges: number[];
+  streakCount: number;
 }
 
 const CATEGORY_LABELS: Record<Category, string> = {
@@ -15,7 +18,7 @@ const CATEGORY_LABELS: Record<Category, string> = {
   dp: "Dynamic Programming",
 };
 
-export default function TrackerDropdown({ categoryProgress }: TrackerDropdownProps) {
+export default function TrackerDropdown({ categoryProgress, earnedBadges, streakCount }: TrackerDropdownProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -67,6 +70,42 @@ export default function TrackerDropdown({ categoryProgress }: TrackerDropdownPro
                 </div>
               );
             })}
+          </div>
+
+          {/* Streak badges section */}
+          <div className="mt-5 pt-4 border-t border-purple-100">
+            <h3 className="font-bold text-purple-800 mb-1">Streak Badges</h3>
+            <p className="text-xs text-gray-500 mb-3">
+              Current streak: {streakCount} {streakCount === 1 ? "day" : "days"}
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {BADGES.map((badge) => {
+                const earned = earnedBadges.includes(badge.streak);
+                return (
+                  <div
+                    key={badge.streak}
+                    className="flex flex-col items-center gap-1"
+                    title={badge.label}
+                  >
+                    <div className={`rounded-lg p-1 ${earned ? "bg-yellow-100 border-2 border-yellow-400" : "bg-gray-100 border-2 border-gray-200"}`}>
+                      <img
+                        src={badge.imageSrc}
+                        alt={badge.label}
+                        width={48}
+                        height={48}
+                        style={{
+                          imageRendering: "pixelated",
+                          filter: earned ? "none" : "grayscale(100%) opacity(40%)",
+                        }}
+                      />
+                    </div>
+                    <span className={`text-[9px] text-center leading-tight ${earned ? "text-yellow-700 font-bold" : "text-gray-400"}`}>
+                      {badge.streak}d
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}
