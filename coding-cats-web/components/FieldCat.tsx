@@ -171,7 +171,7 @@ export default function FieldCat({ initialX = 50, hatSrc = null }: { initialX?: 
           alt="hat"
           style={{
             position: "absolute",
-            top: 9,
+            top: 13,
             left: "50%",
             transform: "translateX(-50%)",
             width: 11,
